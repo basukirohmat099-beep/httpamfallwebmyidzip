@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>Login &amp; Register - FALLSTOREE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap');
+
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: 'Space Grotesk', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :root {
+    --bg-color: #0F172A; /* DASAR GELAP BIAR NEON NYALA */
+    --text-color: #FFFFFF;
+    --card-bg: #1E293B;
+    --shadow-color: #FFDE00;
+    --accent-cyan: #00D2FF;
+    --accent-pink: #FF3366;
+    --accent-green: #25D366;
+    --grid-color: rgba(255,255,255,0.05);
+    --border-thick: 4px;
+    --shadow-hard: 8px 8px 0px var(--shadow-color);
+  }
+
+  /* Kalau lu mau Light Mode tetep kuning, lu bisa aktifin ini */
+  body:not(.dark-mode) {
+    --bg-color: #FFDE00;
+    --text-color: #000;
+    --card-bg: #FFFFFF;
+    --shadow-color: #000;
+    --grid-color: rgba(0,0,0,0.1);
+  }
+
+  /* --- BACKGROUND ANIMATED MESH & GRID --- */
+  body {
+    background-color: var(--bg-color); 
+    /* Grid Pattern tipis */
+    background-image: 
+      linear-gradient(var(--grid-color) 2px, transparent 2px),
+      linear-gradient(90deg, var(--grid-color) 2px, transparent 2px);
+    background-size: 40px 40px;
+    height: 100vh; height: 100dvh;
+    display: flex; justify-content: center; align-items: center;
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Blob Cyan */
+  body::before {
+    content: '';
+    position: absolute;
+    width: 80vw; height: 80vw; max-width: 600px; max-height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--accent-cyan) 0%, transparent 70%);
+    opacity: 0.6;
+    z-index: 0;
+    pointer-events: none;
+    top: -10%; left: -10%;
+    animation: blobFloat1 10s infinite alternate ease-in-out;
+  }
+
+  /* Blob Pink */
+  body::after {
+    content: '';
+    position: absolute;
+    width: 80vw; height: 80vw; max-width: 600px; max-height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--accent-pink) 0%, transparent 70%);
+    opacity: 0.6;
+    z-index: 0;
+    pointer-events: none;
+    bottom: -10%; right: -10%;
+    animation: blobFloat2 12s infinite alternate ease-in-out;
+  }
+
+  @keyframes blobFloat1 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(20%, 15%) scale(1.3); }
+  }
+
+  @keyframes blobFloat2 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-20%, -15%) scale(1.3); }
+  }
+
+  /* --- CONTAINER UTAMA (RESPONSIVE) --- */
+  .auth-wrapper {
+    width: 100%; max-width: 100%; height: 100%;
+    background: var(--card-bg);
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column;
+    border: none; border-radius: 0; box-shadow: none;
+    z-index: 10; /* Biar di atas blob */
+    animation: wrapperIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes wrapperIn {
+    from { opacity: 0; transform: scale(0.95) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* Di PC/Laptop baru dibikinin kotak */
+  @media (min-width: 601px) {
+    body { padding: 20px; }
+    .auth-wrapper {
+      max-width: 450px; height: auto; min-height: 600px; max-height: 90vh;
+      border: var(--border-thick) solid var(--shadow-color);
+      border-radius: 24px;
+      box-shadow: 12px 12px 0px var(--accent-cyan);
+    }
+  }
+
+  /* --- BACKGROUND DECOR & SHOOTING STARS --- */
+  .bg-decor {
+    position: absolute; border-radius: 50%; z-index: 1; pointer-events: none;
+    background: var(--accent-pink); border: 3px solid var(--shadow-color);
+    animation: floatDecor 6s ease-in-out infinite;
+  }
+  .bg-decor:nth-child(1) { width: 60px; height: 60px; top: 10%; left: -20px; animation-delay: 0s; }
+  .bg-decor:nth-child(2) { width: 40px; height: 40px; bottom: 20%; right: -10px; background: var(--accent-cyan); animation-delay: 2s; }
+  .bg-decor:nth-child(3) { width: 80px; height: 80px; bottom: -20px; left: 10%; background: transparent; border: 4px solid var(--shadow-color); animation-delay: 4s; }
+  
+  @keyframes floatDecor {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(20deg); }
+  }
+
+  /* SHOOTING STARS */
+  .shooting-star {
+    position: absolute; width: 4px; height: 4px; background: var(--accent-cyan);
+    border-radius: 50%; box-shadow: 0 0 10px 2px var(--accent-cyan);
+    animation: shoot 3s linear infinite; opacity: 0; z-index: 2;
+  }
+  .shooting-star:nth-child(4) { top: -10%; left: 20%; animation-delay: 0s; }
+  .shooting-star:nth-child(5) { top: -10%; left: 80%; animation-delay: 1.5s; }
+  
+  @keyframes shoot {
+    0% { transform: translate(0, 0); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: translate(-200px, 300px); opacity: 0; }
+  }
+
+  /* --- FORM CONTAINER (SLIDING & ROTATING) --- */
+  .forms-container {
+    position: relative; width: 100%; height: 100%;
+    flex: 1; overflow-y: auto; z-index: 5;
+  }
+
+  .form-section {
+    position: absolute; inset: 0;
+    padding: 40px 30px;
+    display: flex; flex-direction: column; justify-content: center;
+    background: var(--card-bg);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  }
+
+  /* LOGIN STATE */
+  .form-section.login-form {
+    transform: translateX(0) rotateY(0); opacity: 1; pointer-events: auto; z-index: 10;
+  }
+  .form-section.register-form {
+    transform: translateX(100%) rotateY(-15deg); opacity: 0; pointer-events: none; z-index: 5;
+  }
+
+  /* REGISTER STATE */
+  body.show-register .form-section.login-form {
+    transform: translateX(-100%) rotateY(15deg); opacity: 0; pointer-events: none;
+  }
+  body.show-register .form-section.register-form {
+    transform: translateX(0) rotateY(0); opacity: 1; pointer-events: auto; z-index: 10;
+  }
+
+  /* --- HEADER LOGIN/REGISTER --- */
+  .form-header {
+    text-align: center; margin-bottom: 25px;
+  }
+  .logo-icon {
+    width: 70px; height: 70px;
+    background: var(--accent-cyan);
+    border: 4px solid var(--shadow-color);
+    border-radius: 20px;
+    display: inline-flex; justify-content: center; align-items: center;
+    box-shadow: 4px 4px 0 var(--shadow-color);
+    margin-bottom: 15px;
+    animation: logoBounce 2s ease-in-out infinite alternate;
+  }
+  @keyframes logoBounce {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-8px); }
+  }
+  .logo-icon svg { width: 36px; height: 36px; stroke: #000; stroke-width: 3; fill: none; }
+
+  .form-header h1 {
+    font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    position: relative;
+  }
+  .form-header p {
+    font-size: 13px; font-weight: 500; opacity: 0.7; margin-top: 5px;
+    transition: opacity 0.3s;
+  }
+
+  /* ANIMASI TEKS GANTI (ROTATING TEXT) */
+  .rotating-text {
+    display: inline-block;
+    animation: fadeInOut 4s infinite;
+  }
+  @keyframes fadeInOut {
+    0%, 100% { opacity: 1; transform: translateY(0); }
+    50% { opacity: 0.5; transform: translateY(-2px); }
+  }
+
+  /* --- FORM INPUT --- */
+  .input-group {
+    margin-bottom: 18px; position: relative;
+    animation: slideIn 0.5s ease backwards;
+  }
+  .login-form .input-group:nth-child(1) { animation-delay: 0.1s; }
+  .login-form .input-group:nth-child(2) { animation-delay: 0.2s; }
+  .register-form .input-group:nth-child(1) { animation-delay: 0.1s; }
+  .register-form .input-group:nth-child(2) { animation-delay: 0.15s; }
+  .register-form .input-group:nth-child(3) { animation-delay: 0.2s; }
+  .register-form .input-group:nth-child(4) { animation-delay: 0.25s; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-15px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .input-group label {
+    display: block; font-size: 12px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;
+    color: var(--text-color);
+  }
+  .input-group input {
+    width: 100%; padding: 14px 14px 14px 45px;
+    font-size: 15px; font-weight: 700;
+    background: var(--bg-color); color: var(--text-color);
+    border: 3px solid var(--shadow-color); border-radius: 12px;
+    outline: none; transition: all 0.3s;
+    box-shadow: 4px 4px 0 var(--shadow-color);
+  }
+  .input-group input:focus {
+    transform: translateY(-3px); box-shadow: 6px 6px 0 var(--accent-cyan);
+  }
+  
+  /* ANIMASI INPUT ERROR */
+  .input-error {
+    animation: shakeInput 0.4s cubic-bezier(.36,.07,.19,.97) both !important;
+    border-color: var(--accent-pink) !important;
+  }
+  @keyframes shakeInput {
+    10%, 90% { transform: translateX(-2px); }
+    20%, 80% { transform: translateX(4px); }
+    30%, 50%, 70% { transform: translateX(-6px); }
+    40%, 60% { transform: translateX(6px); }
+  }
+
+  .input-icon {
+    position: absolute; left: 15px; top: 38px;
+    width: 20px; height: 20px;
+    stroke: var(--shadow-color); stroke-width: 2.5; fill: none;
+    pointer-events: none;
+  }
+
+  /* --- TOMBOL --- */
+  .btn-primary {
+    width: 100%; padding: 15px;
+    background: var(--accent-cyan); color: #000;
+    border: 3px solid var(--shadow-color); border-radius: 12px;
+    font-size: 16px; font-weight: 700; text-transform: uppercase; cursor: pointer;
+    box-shadow: 5px 5px 0 var(--shadow-color); transition: all 0.2s;
+    margin-top: 10px;
+    position: relative; overflow: hidden;
+  }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 7px 7px 0 var(--shadow-color); }
+  .btn-primary:active { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--shadow-color); }
+
+  /* SHIMMER EFFECT */
+  .btn-primary::after {
+    content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+    transform: skewX(-25deg);
+  }
+  .btn-primary:hover::after {
+    animation: shimmer 0.8s;
+  }
+  @keyframes shimmer {
+    100% { left: 200%; }
+  }
+
+  .divider {
+    display: flex; align-items: center; text-align: center;
+    margin: 20px 0; color: var(--text-color); opacity: 0.5; font-size: 12px; font-weight: 700;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; border-bottom: 2px dashed var(--shadow-color);
+  }
+  .divider:not(:empty)::before { margin-right: 15px; }
+  .divider:not(:empty)::after { margin-left: 15px; }
+
+  .btn-google {
+    width: 100%; padding: 14px;
+    background: var(--card-bg); color: var(--text-color);
+    border: 3px solid var(--shadow-color); border-radius: 12px;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+    box-shadow: 5px 5px 0 var(--shadow-color); transition: all 0.2s;
+    display: flex; justify-content: center; align-items: center; gap: 10px;
+    position: relative; overflow: hidden;
+  }
+  .btn-google:hover { background: var(--bg-color); transform: translateY(-3px); box-shadow: 7px 7px 0 var(--shadow-color); }
+  .btn-google:active { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--shadow-color); }
+  .btn-google svg { width: 22px; height: 22px; z-index: 2; }
+  .btn-google span { z-index: 2; }
+  
+  /* ANIMASI PULSE GLOW DI GOOGLE */
+  .btn-google::before {
+    content: ''; position: absolute; inset: -50%; background: conic-gradient(from 0deg, transparent, var(--accent-cyan), transparent 30%);
+    animation: rotateGlow 4s linear infinite; z-index: 1; opacity: 0;
+  }
+  .btn-google:hover::before { opacity: 0.3; }
+  @keyframes rotateGlow {
+    100% { transform: rotate(360deg); }
+  }
+
+  .switch-text {
+    text-align: center; margin-top: 20px; font-size: 14px; font-weight: 500;
+  }
+  .switch-text a {
+    color: var(--accent-pink); font-weight: 700; text-decoration: none; cursor: pointer;
+    border-bottom: 2px dashed var(--accent-pink);
+    transition: color 0.2s;
+  }
+  .switch-text a:hover { color: #ff1a53; }
+
+  /* FORM SHAKE (LOGIN/REGISTER ERROR) */
+  .shake-form {
+    animation: shakeForm 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  }
+  @keyframes shakeForm {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+  }
+
+  /* --- POPUP KEAMANAN --- */
+  .security-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    z-index: 1000; display: flex; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+    backdrop-filter: blur(4px);
+  }
+  .security-overlay.show { opacity: 1; pointer-events: auto; }
+
+  .security-modal {
+    width: 90%; max-width: 400px; height: 480px;
+    background: var(--card-bg); border: var(--border-thick) solid var(--shadow-color);
+    border-radius: 20px; box-shadow: 8px 8px 0 var(--accent-green);
+    display: flex; flex-direction: column; overflow: hidden;
+    transform: translateY(50px) scale(0.9); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .security-overlay.show .security-modal { transform: translateY(0) scale(1); }
+
+  .security-header {
+    background: var(--accent-green); padding: 15px;
+    border-bottom: 4px solid var(--shadow-color);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .security-header svg { width: 28px; height: 28px; stroke: #000; stroke-width: 2.5; fill: none; }
+  .security-header h2 { font-size: 18px; font-weight: 700; color: #000; text-transform: uppercase; }
+
+  .security-body { flex: 1; position: relative; overflow: hidden; }
+  .slides-wrapper {
+    display: flex; width: 300%; height: 100%;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .slide {
+    width: 33.333%; height: 100%; padding: 20px;
+    overflow-y: auto; font-size: 14px; font-weight: 500; line-height: 1.6;
+    color: var(--text-color);
+  }
+  .slide h3 { font-size: 16px; font-weight: 700; color: var(--accent-pink); margin-bottom: 10px; text-transform: uppercase; }
+  .slide p { margin-bottom: 12px; }
+  .slide ul { padding-left: 20px; margin-bottom: 15px; }
+  .slide li { margin-bottom: 5px; }
+
+  .security-footer {
+    padding: 15px; border-top: 4px solid var(--shadow-color);
+    background: var(--card-bg); display: flex; justify-content: space-between; align-items: center;
+  }
+  .dots { display: flex; gap: 8px; }
+  .dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    border: 2px solid var(--shadow-color); background: var(--card-bg);
+    cursor: pointer; transition: all 0.3s;
+  }
+  .dot.active { background: var(--accent-pink); transform: scale(1.2); }
+  .nav-btns { display: flex; gap: 10px; }
+  .nav-btn {
+    padding: 8px 16px; font-size: 14px; font-weight: 700;
+    border: 3px solid var(--shadow-color); border-radius: 8px;
+    cursor: pointer; background: var(--bg-color); color: var(--text-color);
+    box-shadow: 3px 3px 0 var(--shadow-color); transition: all 0.1s;
+  }
+  .nav-btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--shadow-color); }
+  .nav-btn.next { background: var(--accent-cyan); color: #000; }
+  .nav-btn.finish { background: var(--accent-green); color: #000; }
+
+  /* CUSTOM ALERT MODAL */
+  .custom-alert {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 2000; display: flex; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transition: 0.3s;
+  }
+  .custom-alert.show { opacity: 1; pointer-events: auto; }
+  .alert-box {
+    background: var(--card-bg); border: 3px solid var(--shadow-color);
+    border-radius: 16px; padding: 20px; width: 90%; max-width: 300px;
+    text-align: center; box-shadow: 6px 6px 0 var(--accent-pink);
+    transform: scale(0.8); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .custom-alert.show .alert-box { transform: scale(1); }
+  .alert-box h3 { font-size: 18px; color: var(--accent-pink); margin-bottom: 10px; }
+  .alert-box p { font-size: 14px; margin-bottom: 20px; font-weight: 500; }
+  .alert-box button {
+    width: 100%; padding: 10px; font-size: 14px; font-weight: 700;
+    background: var(--accent-cyan); color: #000;
+    border: 3px solid var(--shadow-color); border-radius: 8px; cursor: pointer;
+    box-shadow: 3px 3px 0 var(--shadow-color);
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: var(--shadow-color); color: var(--bg-color);
+    padding: 15px 25px; border-radius: 12px; font-size: 14px; font-weight: 700;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 9999; white-space: nowrap;
+    opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+</style>
+<link rel="stylesheet" href="css/fontawesome4.min.css">
+<link rel="stylesheet" href="css/fontawesome6.min.css">
+</head>
+<body>
+<div class="auth-wrapper">
+<!-- BACKGROUND DECOR & SHOOTING STARS -->
+<div class="bg-decor"></div>
+<div class="bg-decor"></div>
+<div class="bg-decor"></div>
+<div class="shooting-star"></div>
+<div class="shooting-star"></div>
+<div class="forms-container">
+<!-- ================= HALAMAN LOGIN ================= -->
+<div class="form-section login-form" id="loginFormSection">
+<div class="form-header">
+<div class="logo-icon">
+<svg viewbox="0 0 24 24"><rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+</div>
+<h1><span class="rotating-text" id="rotatingText">Selamat Datang</span></h1>
+<p>Masuk ke akun FALLSTOREE kamu</p>
+</div>
+<form id="loginForm" onsubmit="handleLogin(event)">
+<div class="input-group">
+<label>Email / Username</label>
+<svg class="input-icon" viewbox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+<input autocomplete="off" id="loginEmail" placeholder="Masukkan email/username" required="" type="text"/>
+</div>
+<div class="input-group">
+<label>Password</label>
+<svg class="input-icon" viewbox="0 0 24 24"><rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+<input id="loginPass" placeholder="Masukkan password" required="" type="password"/>
+</div>
+<button class="btn-primary" type="submit">Masuk Sekarang</button>
+</form>
+<div class="divider">ATAU</div>
+<button class="btn-google" onclick="handleGoogleLogin()">
+<svg viewbox="0 0 48 48">
+<path d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" fill="#EA4335"></path>
+<path d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" fill="#4285F4"></path>
+<path d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" fill="#FBBC05"></path>
+<path d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" fill="#34A853"></path>
+</svg>
+<span>Lanjutkan dengan Google</span>
+</button>
+<div class="switch-text">
+          Belum punya akun? <a onclick="switchForm('register')">Daftar di sini</a>
+</div>
+</div>
+<!-- ================= HALAMAN REGISTER ================= -->
+<div class="form-section register-form" id="registerFormSection">
+<div class="form-header">
+<div class="logo-icon" style="background: var(--accent-pink);">
+<svg style="stroke:#fff;" viewbox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" x2="20" y1="8" y2="14"></line><line x1="23" x2="17" y1="11" y2="11"></line></svg>
+</div>
+<h1>Buat Akun</h1>
+<p>Daftar untuk mengakses FALLSTOREE</p>
+</div>
+<form id="registerForm" onsubmit="handleRegister(event)">
+<div class="input-group">
+<label>Nama Lengkap</label>
+<svg class="input-icon" viewbox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+<input autocomplete="off" id="regName" placeholder="Masukkan nama" required="" type="text"/>
+</div>
+<div class="input-group">
+<label>Email</label>
+<svg class="input-icon" viewbox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+<input autocomplete="off" id="regEmail" placeholder="Masukkan email" required="" type="email"/>
+</div>
+<div class="input-group">
+<label>Password</label>
+<svg class="input-icon" viewbox="0 0 24 24"><rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+<input id="regPass1" placeholder="Buat password" required="" type="password"/>
+</div>
+<div class="input-group">
+<label>Konfirmasi Password</label>
+<svg class="input-icon" viewbox="0 0 24 24"><rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+<input id="regPass2" placeholder="Ulangi password" required="" type="password"/>
+</div>
+<button class="btn-primary" style="background: var(--accent-pink); color: #fff;" type="submit">Daftar Sekarang</button>
+</form>
+<div class="switch-text" style="margin-top: 25px;">
+          Sudah punya akun? <a onclick="switchForm('login')">Masuk di sini</a>
+</div>
+</div>
+</div>
+</div>
+<!-- POPUP KEAMANAN -->
+<div class="security-overlay" id="securityOverlay">
+<div class="security-modal">
+<div class="security-header">
+<svg viewbox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+<h2>Sistem Keamanan</h2>
+</div>
+<div class="security-body">
+<div class="slides-wrapper" id="slidesWrapper">
+<div class="slide">
+<h3>🛡️ Website 100% Aman</h3>
+<p>Halo! Selamat datang. Kami sangat serius dalam menjaga keamanan dan privasi data kamu.</p>
+<p>Website ini dilindungi oleh sistem enkripsi SSL/TLS yang memastikan semua data yang kamu kirim aman.</p>
+<p>Setiap aktivitas login dipantau secara real-time untuk mencegah akses tidak sah.</p>
+</div>
+<div class="slide">
+<h3>🔒 Privasi Data Terjamin</h3>
+<p>Kami tidak akan pernah membagikan data pribadi kamu kepada pihak ketiga tanpa izin.</p>
+<ul>
+<li>Password disimpan dalam bentuk hash (acak) yang aman.</li>
+<li>Kami hanya meminta informasi yang diperlukan.</li>
+<li>Kamu bisa menghapus akun kapan saja.</li>
+</ul>
+</div>
+<div class="slide">
+<h3>🚀 Login Tanpa Ribet</h3>
+<p>Gunakan akun Google kamu untuk login instan dengan sistem OAuth 2.0 yang aman.</p>
+<p>Jangan lupa jaga kerahasiaan OTP dan password kamu ya!</p>
+</div>
+</div>
+</div>
+<div class="security-footer">
+<div class="dots">
+<div class="dot active" onclick="goToSlide(0)"></div>
+<div class="dot" onclick="goToSlide(1)"></div>
+<div class="dot" onclick="goToSlide(2)"></div>
+</div>
+<div class="nav-btns">
+<button class="nav-btn next" id="nextBtn" onclick="nextSlide()">Lanjut</button>
+</div>
+</div>
+</div>
+</div>
+<!-- CUSTOM ALERT -->
+<div class="custom-alert" id="customAlert">
+<div class="alert-box">
+<h3 id="alertTitle">Peringatan</h3>
+<p id="alertMsg">Pesan</p>
+<button onclick="closeAlert()">Tutup</button>
+</div>
+</div>
+<!-- TOAST -->
+<div class="toast" id="toast">Notifikasi</div>
+<script>
+    // --- 1. LOGIKA SLIDE KEAMANAN ---
+    let currentSlide = 0;
+    const totalSlides = 3;
+    const slidesWrapper = document.getElementById('slidesWrapper');
+    const dots = document.querySelectorAll('.dot');
+    const nextBtn = document.getElementById('nextBtn');
+    const securityOverlay = document.getElementById('securityOverlay');
+
+    window.addEventListener('load', () => {
+      setTimeout(() => { securityOverlay.classList.add('show'); }, 500);
+    });
+
+    function updateSlideUI() {
+      slidesWrapper.style.transform = `translateX(-${currentSlide * 33.333}%)`;
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlide);
+      });
+      if (currentSlide === totalSlides - 1) {
+        nextBtn.innerText = "Mengerti & Lanjut";
+        nextBtn.classList.add('finish');
+        nextBtn.classList.remove('next');
+        nextBtn.onclick = () => {
+          securityOverlay.classList.remove('show');
+          showToast("Silakan login atau daftar.");
+        };
+      } else {
+        nextBtn.innerText = "Lanjut";
+        nextBtn.classList.add('next');
+        nextBtn.classList.remove('finish');
+        nextBtn.onclick = nextSlide;
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) { currentSlide++; updateSlideUI(); }
+    }
+    function goToSlide(index) { currentSlide = index; updateSlideUI(); }
+
+    // --- 2. TOAST & CUSTOM ALERT ---
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function showAlert(title, msg) {
+      document.getElementById('alertTitle').innerText = title;
+      document.getElementById('alertMsg').innerText = msg;
+      document.getElementById('customAlert').classList.add('show');
+    }
+    function closeAlert() {
+      document.getElementById('customAlert').classList.remove('show');
+    }
+
+    // --- 3. SWITCH FORM (LOGIN <-> REGISTER) ---
+    function switchForm(type) {
+      if (type === 'register') {
+        document.body.classList.add('show-register');
+      } else {
+        document.body.classList.remove('show-register');
+      }
+    }
+
+    // --- 4. ROTATING TEXT LOGIC ---
+    const texts = ["Selamat Datang", "Halo Kembali!", "Ayo Masuk!"];
+    let textIndex = 0;
+    setInterval(() => {
+      const el = document.getElementById('rotatingText');
+      textIndex = (textIndex + 1) % texts.length;
+      el.style.opacity = 0;
+      setTimeout(() => {
+        el.innerText = texts[textIndex];
+        el.style.opacity = 1;
+      }, 300); // Waktu fade out
+    }, 3000);
+
+    // Login terhubung ke backend
+    async function handleLogin(e) {
+      e.preventDefault();
+      const identifier = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPass').value;
+      const form = document.getElementById('loginForm');
+      const btn = form.querySelector('.btn-primary');
+      if (!identifier || !password) {
+        form.classList.add('shake-form');
+        setTimeout(() => form.classList.remove('shake-form'), 500);
+        return;
+      }
+      const original = btn.innerText;
+      btn.disabled = true; btn.innerText = 'Memproses...';
+      try {
+        const r = await fetch('/api/auth/login', {
+          method:'POST', credentials:'same-origin',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({identifier, password})
+        });
+        const data = await r.json();
+        if (!r.ok || !data.status) throw new Error(data.message || 'Login gagal.');
+        showToast('Login berhasil!');
+        location.href = '/';
+      } catch (err) {
+        showAlert('Login Gagal', err.message || 'Koneksi gagal.');
+      } finally {
+        btn.disabled = false; btn.innerText = original;
+      }
+    }
+
+    // Registrasi akun permanen
+    async function handleRegister(e) {
+      e.preventDefault();
+      const username = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPass1').value;
+      const confirm = document.getElementById('regPass2').value;
+      const form = document.getElementById('registerForm');
+      const btn = form.querySelector('.btn-primary');
+      if (password !== confirm) {
+        form.classList.add('shake-form');
+        document.getElementById('regPass1').classList.add('input-error');
+        document.getElementById('regPass2').classList.add('input-error');
+        setTimeout(() => {
+          form.classList.remove('shake-form');
+          document.getElementById('regPass1').classList.remove('input-error');
+          document.getElementById('regPass2').classList.remove('input-error');
+        }, 500);
+        showAlert('Password Tidak Cocok', 'Password dan konfirmasi harus sama.');
+        return;
+      }
+      const original = btn.innerText;
+      btn.disabled = true; btn.innerText = 'Mendaftar...';
+      try {
+        const r = await fetch('/api/auth/register', {
+          method:'POST', credentials:'same-origin',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({username, email, password})
+        });
+        const data = await r.json();
+        if (!r.ok || !data.status) throw new Error(data.message || 'Registrasi gagal.');
+        showToast('Registrasi berhasil. Silakan login.');
+        switchForm('login');
+      } catch (err) {
+        showAlert('Registrasi Gagal', err.message || 'Koneksi gagal.');
+      } finally {
+        btn.disabled = false; btn.innerText = original;
+      }
+    }
+    let googleLoginReady = false;
+    async function initGoogleLogin() {
+      try {
+        const r = await fetch('/api/auth/google-config', { credentials: 'same-origin' });
+        const c = await r.json();
+        if (!r.ok || !c.clientId || !window.google?.accounts?.id) return;
+        google.accounts.id.initialize({
+          client_id: c.clientId,
+          callback: async response => {
+            try {
+              const result = await fetch('/api/auth/google', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ credential: response.credential })
+              });
+              const data = await result.json();
+              if (!result.ok || !data.status) throw new Error(data.message || 'Login Google gagal.');
+              showToast('Login Google berhasil.');
+              window.location.href = '/';
+            } catch (err) {
+              showAlert('Login Google Gagal', err.message || 'Silakan coba lagi.');
+            }
+          }
+        });
+        googleLoginReady = true;
+      } catch (_) {}
+    }
+    function handleGoogleLogin() {
+      if (googleLoginReady && window.google?.accounts?.id) {
+        google.accounts.id.prompt(notification => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            showAlert("Google Tidak Muncul", "Coba buka halaman di Chrome dan izinkan pop-up atau cookie Google.");
+          }
+        });
+      } else {
+        showAlert("Google Belum Siap", "Tunggu halaman selesai dimuat, lalu coba lagi.");
+      }
+    }
+  </script>
+<script async="" defer="" onload="initGoogleLogin()" src="https://accounts.google.com/gsi/client"></script>
+</body>
+</html>
